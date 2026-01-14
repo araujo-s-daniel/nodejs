@@ -1,0 +1,52 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const notify = (data) => {
+    const notify = document.getElementById(data.el);
+
+    if (notify) {
+      notify.textContent = data.msg;
+      notify.className = data.classes;
+    }
+  };
+
+  socket.on('notify-onlines', (email) => {
+    var opts = {
+      el: 'notify_' + email
+      , msg: 'Online'
+      , classes: 'label label-success'
+    };
+    notify(opts);
+  });
+
+  socket.on('notify-offlines', (email) => {
+    var opts = {
+      el: 'notify_' + email
+      , msg: 'Offline'
+      , classes: 'label'
+    };
+    notify(opts);
+  });
+
+  socket.on('new-message', (data) => {
+    var opts = {
+      el: 'notify_' + data.email
+      , msg: 'Mensagem'
+      , classes: 'label label-important'
+    };
+    notify(opts);
+
+    const chat = document.getElementById(`chat_${data.email}`);
+
+    if (chat.href.includes('?sala=')) {
+      const matcher = /\?sala=[\w]+/;
+      const replace = `?sala=${data.sala}`
+      chat.href = chat.href.replace(matcher, replace);
+    } else {
+      chat.href += `?sala=${data.sala}`;
+    }
+
+    notify({ email: data.email, msg: 'Mensagem!' });
+  });
+</script>

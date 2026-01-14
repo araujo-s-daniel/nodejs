@@ -7,8 +7,11 @@ const bodyParser = require('body-parser');
 const cookie = require('cookie');
 const expressSession = require('express-session');
 const methodOverride = require('method-override');
+const mongoose = require('mongoose');
 const config = require('./config');
 const error = require('./middlewares/error');
+
+mongoose.connect('mongodb://localhost:27017/ntalk');
 
 const app = express();
 const server = http.Server(app);
@@ -20,12 +23,13 @@ app.set('view engine', 'ejs');
 
 app.use(expressSession({
   store,
+  resave: true,
+  saveUninitialized: true,
   name: config.sessionKey,
   secret: config.sessionSecret
-}))
-
+}));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -52,7 +56,7 @@ consign({})
   .then('controllers')
   .then('routes')
   .then('events')
-  .into(app, io)
+  .into(app, io);
 
 app.use(error.notFound);
 app.use(error.serverError);

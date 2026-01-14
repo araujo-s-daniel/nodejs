@@ -1,17 +1,30 @@
 module.exports = (app) => {
+  const Usuario = app.models.usuario;
+
   const HomeController = {
     index(req, res) {
       res.render('home/index');
     },
-    login(req, res) {
+    async login(req, res) {
       const { usuario } = req.body;
       const { email, nome } = usuario;
+      const where = { email, nome };
 
-      if (email && nome) {
-        usuario.contatos = [];
+      const set = {
+        $setOnInsert: { email, nome, contatos: [] }
+      };
+
+      const options = {
+        upsert: true, runValidators: true, new: true
+      };
+
+      try {
+        const usuario = await Usuario
+          .findOneAndUpdate(where, set, options)
+          .select('email nome');
         req.session.usuario = usuario;
         res.redirect('/contatos');
-      } else {
+      } catch {
         res.redirect('/');
       }
     },

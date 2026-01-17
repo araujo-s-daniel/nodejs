@@ -5,6 +5,7 @@
   </header>
   <section class="row-fluid text-center">
     <form action="/contato/<%- contato._id %>?_method=delete" method="post" class="well form-inline">
+      <input type="hidden" name="_csrf" value="<%- _csrf %>">
       <p>
         <label>Nome:</label>
         <span class="input-medium uneditable-input"><%- contato.nome %></span>

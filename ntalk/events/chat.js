@@ -1,4 +1,5 @@
-const redis = require('redis').createClient();
+const config = require('../config.js');
+const redis = require('redis').createClient(config.redis);
 
 module.exports = (app, io) => {
   io.on('connection', (client) => {
@@ -33,7 +34,7 @@ module.exports = (app, io) => {
       redis.lpush(hashDaSala, resposta, () => {
         redis.lrange(hashDaSala, 0, -1, (err, msgs) => {
           msgs.forEach((msg) => {
-            io.to(hashDaSala).emit('send-client', msg);
+            io.to(hashDaSala).emit('send-client', resposta);
           });
         });
       });
